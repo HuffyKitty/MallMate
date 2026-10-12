@@ -1,0 +1,12 @@
+{"case_id":"retrieval-holdout-001","query":"无理由退货的运费由谁承担","relevant_document_ids":["policy_seven_day_return"]}
+{"case_id":"retrieval-holdout-002","query":"耐用品功能缺陷要不要人工检测","relevant_document_ids":["policy_quality_refund"]}
+{"case_id":"retrieval-holdout-003","query":"十五天以内能申请换码吗","relevant_document_ids":["policy_exchange"]}
+{"case_id":"retrieval-holdout-004","query":"数字软件拆封后能无理由退吗","relevant_document_ids":["policy_return_exclusions"]}
+{"case_id":"retrieval-holdout-005","query":"还没发货为什么查不到运单","relevant_document_ids":["policy_logistics_query"]}
+{"case_id":"retrieval-holdout-006","query":"包裹可能丢失可以马上赔偿吗","relevant_document_ids":["policy_logistics_exception"]}
+{"case_id":"retrieval-holdout-007","query":"模型能根据破损照片直接认定责任吗","relevant_document_ids":["policy_damaged_product"]}
+{"case_id":"retrieval-holdout-008","query":"漏发一个商品可以整单退款吗","relevant_document_ids":["policy_missing_wrong_item"]}
+{"case_id":"retrieval-holdout-009","query":"优惠券支付的订单退款怎么返还","relevant_document_ids":["policy_coupon_invoice","policy_refund_arrival"]}
+{"case_id":"retrieval-holdout-010","query":"售后图片保存在什么地方谁能读取","relevant_document_ids":["policy_evidence_guide","policy_privacy_security"]}
+{"case_id":"retrieval-holdout-011","query":"工具连续失败以后如何交给客服","relevant_document_ids":["policy_human_handoff"]}
+{"case_id":"retrieval-holdout-012","query":"退款处理中和已经完成有什么区别","relevant_document_ids":["policy_after_sales_process"]}

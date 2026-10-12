@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mallmate-backend"
+version = "0.1.0"
+description = "MallMate customer service agent scaffold"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "sqlalchemy>=2.0,<3",
+  "pydantic-settings>=2.5,<3",
+  "psycopg[binary]>=3.2,<4",
+  "langgraph>=0.6,<2",
+  "openai>=1.60,<3",
+  "prometheus-client>=0.21,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+

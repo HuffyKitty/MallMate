@@ -1,0 +1,93 @@
+{
+  "dataset_version": "mallmate-eval-2026.10-v1",
+  "split": "dev",
+  "generated_at": "2026-10-12T22:21:05.455487+08:00",
+  "model_mode": "deterministic_offline_baseline",
+  "intent": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "per_label": {
+      "damaged_product": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "exchange_request": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "human_handoff": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "logistics_abnormal": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "logistics_query": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "missing_product": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "order_query": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "refund_request": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "return_request": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "wrong_product": {
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "cases": 40,
+    "urgency_accuracy": 1.0,
+    "failures": []
+  },
+  "retrieval": {
+    "cases": 24,
+    "recall_at_5": 1.0,
+    "mrr": 0.9167,
+    "ndcg_at_5": 0.9419,
+    "failures": []
+  },
+  "policy": {
+    "cases": 12,
+    "exact_match": 1.0,
+    "failures": []
+  },
+  "thresholds": {
+    "intent_macro_f1": 0.8,
+    "retrieval_recall_at_5": 0.85,
+    "policy_exact_match": 0.95
+  },
+  "passed": true
+}

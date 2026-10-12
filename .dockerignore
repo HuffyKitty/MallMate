@@ -1,0 +1,10 @@
+.venv
+.cache
+data
+backend/*.db
+backend/*.db-*
+frontend/node_modules
+frontend/.next
+frontend/.env.local
+.git
+

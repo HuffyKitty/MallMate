@@ -1,0 +1,28 @@
+:root { color-scheme: light; font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f7fb; color: #1d2940; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1180px; padding: 36px 24px; margin: auto; }
+header { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
+h1 { margin: 8px 0 0; font-size: 30px; }
+h2 { margin: 0 0 8px; font-size: 20px; }
+.eyebrow { color: #375de1; font-size: 12px; font-weight: 800; letter-spacing: .14em; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr); gap: 20px; }
+.panel { background: #fff; padding: 24px; border: 1px solid #e1e7f0; border-radius: 16px; box-shadow: 0 10px 30px #1e3a6a0a; }
+.hint, .empty, footer { color: #66748c; font-size: 14px; line-height: 1.5; }
+.messages { height: 430px; overflow: auto; margin: 20px 0; padding: 6px 0; }
+.bubble { max-width: 88%; padding: 12px 15px; border-radius: 13px; margin-bottom: 12px; background: #eef2f9; line-height: 1.5; }
+.bubble.user { margin-left: auto; background: #e6edff; }
+.bubble p { margin: 6px 0 0; white-space: pre-wrap; }
+.bubble small { display: block; margin-top: 8px; color: #5d6b82; overflow-wrap: anywhere; }
+label { display: block; font-size: 14px; font-weight: 600; }
+input, select, textarea { width: 100%; font: inherit; padding: 10px 12px; margin-top: 7px; border: 1px solid #cbd5e3; border-radius: 9px; background: #fff; color: inherit; }
+.input-row { display: flex; gap: 10px; }
+.input-row input { margin: 0; }
+button { border: 0; padding: 11px 18px; border-radius: 9px; background: #375de1; color: white; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.case-form { display: grid; gap: 16px; margin-top: 22px; }
+.preview { margin-top: 20px; padding: 16px; border-radius: 10px; background: #eff5ff; line-height: 1.5; }
+.success { color: #137a42; font-weight: 700; }.error { color: #b42332; }
+footer { margin-top: 22px; }
+@media (max-width: 800px) { header { display: block; } header label { margin-top: 20px; } .grid { grid-template-columns: 1fr; } .messages { height: 330px; } }
+

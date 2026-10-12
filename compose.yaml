@@ -1,0 +1,105 @@
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg17
+    environment:
+      POSTGRES_DB: mallmate
+      POSTGRES_USER: mallmate
+      POSTGRES_PASSWORD: mallmate_dev_only
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/01-vector.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mallmate -d mallmate"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+
+  chroma:
+    image: chromadb/chroma:latest
+    ports:
+      - "18000:8000"
+    volumes:
+      - ./data/chroma:/data
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: mallmate
+      MINIO_ROOT_PASSWORD: mallmate_dev_only
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data/minio:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      MALLMATE_DATABASE_URL: postgresql+psycopg://mallmate:mallmate_dev_only@db:5432/mallmate
+      MALLMATE_CORS_ORIGINS: http://localhost:3000
+      MALLMATE_REDIS_URL: redis://redis:6379/0
+      MALLMATE_CHROMA_HOST: chroma
+      MALLMATE_CHROMA_PORT: 8000
+      MALLMATE_CHROMA_COLLECTION: mallmate_knowledge
+      MALLMATE_MINIO_ENDPOINT: http://minio:9000
+      MALLMATE_MINIO_ACCESS_KEY: mallmate
+      MALLMATE_MINIO_SECRET_KEY: mallmate_dev_only
+      MALLMATE_MINIO_BUCKET: mallmate-evidence
+      MALLMATE_LLM_ENABLED: ${MALLMATE_LLM_ENABLED:-false}
+      MALLMATE_LLM_PROVIDER: dashscope
+      MALLMATE_LLM_BASE_URL: ${MALLMATE_LLM_BASE_URL:-}
+      MALLMATE_LLM_CHAT_MODEL: qwen-plus
+      MALLMATE_LLM_INTENT_MODEL: qwen-flash
+      MALLMATE_LLM_VISION_MODEL: qwen-vl-plus
+      MALLMATE_LLM_EMBEDDING_MODEL: text-embedding-v4
+      MALLMATE_LLM_RERANK_MODEL: qwen3-rerank
+      MALLMATE_LLM_API_KEY: ${MALLMATE_LLM_API_KEY:-}
+      MALLMATE_PROMETHEUS_ENABLED: "true"
+    ports:
+      - "18080:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      chroma:
+        condition: service_started
+      minio:
+        condition: service_started
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:18080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    ports:
+      - "19090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./data/prometheus:/prometheus
+    depends_on:
+      - backend
+

@@ -1,0 +1,24 @@
+{"case_id":"retrieval-dev-001","query":"签收后七天内可以无理由退货吗","relevant_document_ids":["policy_seven_day_return"]}
+{"case_id":"retrieval-dev-002","query":"拆开包装检查后还能退吗","relevant_document_ids":["policy_seven_day_return"]}
+{"case_id":"retrieval-dev-003","query":"质量有问题超过七天怎么处理","relevant_document_ids":["policy_quality_refund"]}
+{"case_id":"retrieval-dev-004","query":"商品故障需要提供什么信息","relevant_document_ids":["policy_quality_refund"]}
+{"case_id":"retrieval-dev-005","query":"鞋子尺码不合适如何换货","relevant_document_ids":["policy_exchange"]}
+{"case_id":"retrieval-dev-006","query":"目标颜色没有库存还能换吗","relevant_document_ids":["policy_exchange"]}
+{"case_id":"retrieval-dev-007","query":"定制刻字商品支持无理由退货吗","relevant_document_ids":["policy_return_exclusions"]}
+{"case_id":"retrieval-dev-008","query":"冷藏蛋糕为什么不能七天无理由退货","relevant_document_ids":["policy_return_exclusions"]}
+{"case_id":"retrieval-dev-009","query":"没有订单号怎么查询最近的物流","relevant_document_ids":["policy_logistics_query"]}
+{"case_id":"retrieval-dev-010","query":"预计到达时间是不是保证时间","relevant_document_ids":["policy_logistics_query"]}
+{"case_id":"retrieval-dev-011","query":"物流长时间停在转运中心怎么办","relevant_document_ids":["policy_logistics_exception"]}
+{"case_id":"retrieval-dev-012","query":"快递显示签收但我没有收到","relevant_document_ids":["policy_logistics_exception"]}
+{"case_id":"retrieval-dev-013","query":"收到破损商品需要拍哪些照片","relevant_document_ids":["policy_damaged_product","policy_evidence_guide"]}
+{"case_id":"retrieval-dev-014","query":"电器起火还能继续通电拍视频吗","relevant_document_ids":["policy_safety_incident","policy_damaged_product"]}
+{"case_id":"retrieval-dev-015","query":"包裹少件要提供开箱视频吗","relevant_document_ids":["policy_missing_wrong_item"]}
+{"case_id":"retrieval-dev-016","query":"商家发错颜色可以补发还是退款","relevant_document_ids":["policy_missing_wrong_item"]}
+{"case_id":"retrieval-dev-017","query":"退款按什么支付路径到账","relevant_document_ids":["policy_refund_arrival"]}
+{"case_id":"retrieval-dev-018","query":"部分退货以后满减怎么计算","relevant_document_ids":["policy_coupon_invoice","policy_refund_arrival"]}
+{"case_id":"retrieval-dev-019","query":"哪些情况系统必须转人工客服","relevant_document_ids":["policy_human_handoff"]}
+{"case_id":"retrieval-dev-020","query":"别人知道订单号能查看我的地址吗","relevant_document_ids":["policy_privacy_security"]}
+{"case_id":"retrieval-dev-021","query":"售后单 pending_evidence 是什么状态","relevant_document_ids":["policy_after_sales_process"]}
+{"case_id":"retrieval-dev-022","query":"创建售后申请为什么要幂等键","relevant_document_ids":["policy_after_sales_process"]}
+{"case_id":"retrieval-dev-023","query":"照片里要遮挡银行卡和身份证吗","relevant_document_ids":["policy_evidence_guide","policy_privacy_security"]}
+{"case_id":"retrieval-dev-024","query":"食品变质导致身体不适怎么处理","relevant_document_ids":["policy_safety_incident"]}
