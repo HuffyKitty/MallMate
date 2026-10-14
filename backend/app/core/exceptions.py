@@ -17,6 +17,10 @@ class AuthenticationError(ApplicationError):
     code = "authentication_failed"
 
 
+class AuthorizationError(ApplicationError):
+    code = "permission_denied"
+
+
 class ResourceNotFoundError(ApplicationError):
     code = "resource_not_found"
 

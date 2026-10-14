@@ -38,5 +38,10 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
             HTTP_DURATION.labels(request.method, route_template).observe(perf_counter() - started)
 
 
-def metrics_response() -> Response:
+def metrics_response(_request: Request) -> Response:
+    """返回 Prometheus 文本格式指标。
+
+    这里使用 Starlette 的 ``add_route`` 注册，因此处理函数必须接收当前 Request。
+    本函数暂时不读取请求内容，参数以下划线开头用于明确表达“框架需要，但代码未使用”。
+    """
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)

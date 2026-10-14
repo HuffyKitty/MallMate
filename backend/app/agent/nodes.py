@@ -11,7 +11,7 @@ from langgraph.runtime import Runtime
 from app.agent.state import AgentContext, AgentState
 from app.agent.intent import classify_intent
 from app.core.enums import Intent
-from app.core.exceptions import ResourceNotFoundError
+from app.core.exceptions import AuthorizationError, ResourceNotFoundError
 
 
 def classify(state: AgentState) -> AgentState:
@@ -50,13 +50,17 @@ def answer_faq(state: AgentState, runtime: Runtime[AgentContext]) -> AgentState:
 def answer_order(state: AgentState, runtime: Runtime[AgentContext]) -> AgentState:
     """处理订单、物流和退换货入口，业务事实全部来自 OrderService。"""
 
+    customer_id = runtime.context.principal.customer_id
+    if customer_id is None:
+        raise AuthorizationError("当前账号没有查询顾客订单的权限")
+
     match = re.search(r"\d{4,}", state["message"])
     if match is None:
         return {"answer": "请提供订单号，我会查询当前演示账号下的订单。", "sources": []}
 
     order_id = int(match.group())
     try:
-        order = runtime.context.orders.get_owned_order(state["customer_id"], order_id)
+        order = runtime.context.orders.get_owned_order(customer_id, order_id)
     except ResourceNotFoundError:
         return {"answer": "当前账号下没有找到该订单，请核对订单号。", "sources": []}
 
@@ -81,7 +85,7 @@ def answer_order(state: AgentState, runtime: Runtime[AgentContext]) -> AgentStat
             "sources": [],
         }
     if state["intent"] in {Intent.LOGISTICS_QUERY, Intent.LOGISTICS_ABNORMAL}:
-        logistics = runtime.context.orders.get_logistics_data(state["customer_id"], order_id)
+        logistics = runtime.context.orders.get_logistics_data(customer_id, order_id)
         return {
             "answer": (
                 f"订单 {order_id} 的物流状态为 {logistics['status']}；"
@@ -90,7 +94,7 @@ def answer_order(state: AgentState, runtime: Runtime[AgentContext]) -> AgentStat
             "sources": [],
         }
 
-    order_data = runtime.context.orders.get_order_data(state["customer_id"], order_id)
+    order_data = runtime.context.orders.get_order_data(customer_id, order_id)
     items = "、".join(
         f"{item['name']} ×{item['quantity']}" for item in order_data["items"]
     )

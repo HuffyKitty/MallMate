@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, Header
 
-from app.api.dependencies import current_customer, get_after_sales_service
+from app.api.dependencies import get_after_sales_service, get_current_customer
 from app.models import Customer
 from app.schemas.after_sales import (
     AfterSalesCaseResponse,
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/after-sales", tags=["after-sales"])
 @router.post("/preview", response_model=CasePreviewResponse)
 def preview_after_sales(
     request: CaseRequest,
-    customer: Customer = Depends(current_customer),
+    customer: Customer = Depends(get_current_customer),
     after_sales: AfterSalesService = Depends(get_after_sales_service),
 ):
     # 预览只读，便于前端展示资格结果并请求用户明确确认。
@@ -32,7 +32,7 @@ def preview_after_sales(
 def confirm_after_sales(
     request: ConfirmRequest,
     idempotency_key: str = Header(min_length=8, max_length=120, alias="Idempotency-Key"),
-    customer: Customer = Depends(current_customer),
+    customer: Customer = Depends(get_current_customer),
     after_sales: AfterSalesService = Depends(get_after_sales_service),
 ) -> dict:
     case = after_sales.create(

@@ -5,11 +5,13 @@ from fastapi import APIRouter, Depends
 from app.agent.graph import agent_graph
 from app.agent.state import AgentContext
 from app.api.dependencies import (
-    current_customer,
     get_conversation_service,
+    get_current_customer,
+    get_current_principal,
     get_knowledge_service,
     get_order_service,
 )
+from app.core.security import Principal
 from app.models import Customer
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.conversations import ConversationService
@@ -23,7 +25,8 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 @router.post("", response_model=ChatResponse)
 def chat(
     request: ChatRequest,
-    customer: Customer = Depends(current_customer),
+    customer: Customer = Depends(get_current_customer),
+    principal: Principal = Depends(get_current_principal),
     conversations: ConversationService = Depends(get_conversation_service),
     orders: OrderService = Depends(get_order_service),
     knowledge: KnowledgeService = Depends(get_knowledge_service),
@@ -32,8 +35,8 @@ def chat(
 
     # State 保存任务数据；Context 注入本次请求可用的业务服务。
     result = agent_graph.invoke(
-        {"message": request.message, "customer_id": customer.id},
-        context=AgentContext(orders=orders, knowledge=knowledge),
+        {"message": request.message},
+        context=AgentContext(principal=principal, orders=orders, knowledge=knowledge),
     )
     conversations.save_exchange(conversation.id, request.message, result["answer"])
     return {

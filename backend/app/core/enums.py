@@ -13,6 +13,22 @@ class Environment(StrEnum):
     PRODUCTION = "production"
 
 
+class UserRole(StrEnum):
+    """第一版账号角色；复杂的多角色权限表留到确有需求时再引入。"""
+
+    CUSTOMER = "customer"
+    SUPPORT = "support"
+    ADMIN = "admin"
+
+
+class AccountStatus(StrEnum):
+    """账号能否继续认证和访问受保护资源。"""
+
+    ACTIVE = "active"
+    LOCKED = "locked"
+    DISABLED = "disabled"
+
+
 class Intent(StrEnum):
     """首版固定的 10 类售后意图。
 

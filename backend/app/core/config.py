@@ -6,8 +6,9 @@
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
-from pydantic import SecretStr, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.core.enums import Environment
@@ -24,8 +25,12 @@ class Settings(BaseSettings):
     )
 
     environment: Environment = Environment.DEVELOPMENT
-    demo_mode: bool = True
-    seed_demo_data: bool = True
+    # 演示身份会接受客户端提供的 X-Demo-User，因此必须由本机配置显式开启。
+    # 配置文件缺失或环境变量拼错时保持关闭，避免服务以可冒充身份的模式启动。
+    demo_mode: bool = False
+    # 自动写入公开开发账号同样采用失败关闭。setup.ps1 生成的本机 .env 会按需
+    # 显式开启，生产配置则由下面的校验器强制禁止。
+    seed_demo_data: bool = False
 
     database_url: str = "sqlite:///./mallmate_dev_v2.db"
     database_echo: bool = False
@@ -34,6 +39,22 @@ class Settings(BaseSettings):
     database_pool_timeout_seconds: int = 30
 
     cors_origins: str = "http://localhost:3000"
+
+    # 正式认证默认由环境配置显式开启，避免缺少密钥时误以为系统已经受到保护。
+    # scripts/setup.ps1 会为本机生成不进入 Git 的随机密钥并开启认证。
+    auth_enabled: bool = False
+    jwt_secret: SecretStr = SecretStr("")
+    jwt_algorithm: str = "HS256"
+    jwt_issuer: str = "mallmate-api"
+    jwt_audience: str = "mallmate-web"
+    # 非正有效期会让服务成功启动、却只签发立即失效的令牌。把错误提前到配置
+    # 解析阶段，避免登录接口在运行期持续返回看似成功但无法使用的凭据。
+    access_token_minutes: int = Field(default=15, gt=0)
+    refresh_token_days: int = Field(default=7, gt=0)
+    refresh_cookie_name: str = "mallmate_refresh"
+    refresh_cookie_path: str = "/api/v1/auth"
+    cookie_secure: bool = False
+    cookie_samesite: Literal["lax", "strict", "none"] = "lax"
 
     # 基础设施连接信息。开发环境可不启动这些服务，Docker 环境由 compose 注入。
     redis_url: str = "redis://localhost:6379/0"
@@ -67,10 +88,32 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def reject_demo_options_in_production(self) -> "Settings":
-        """防止生产环境误启用演示身份或自动写入演示数据。"""
+        """启动时拒绝明显不安全的生产配置，而不是带着风险继续运行。"""
 
         if self.environment == Environment.PRODUCTION and (self.demo_mode or self.seed_demo_data):
             raise ValueError("生产环境必须关闭 demo_mode 和 seed_demo_data")
+        if self.environment == Environment.PRODUCTION and not self.auth_enabled:
+            raise ValueError("生产环境必须开启 auth_enabled")
+
+        secret = self.jwt_secret.get_secret_value()
+        if self.auth_enabled and len(secret) < 32:
+            raise ValueError("开启认证时 MALLMATE_JWT_SECRET 至少需要 32 个字符")
+        if self.jwt_algorithm != "HS256":
+            raise ValueError("当前版本只允许经过验证的 HS256 JWT 算法")
+        # SameSite=None 的 Cookie 必须同时带 Secure；否则现代浏览器会直接拒收，
+        # 后端却仍返回登录成功，最终表现为刷新和会话恢复一直失败。
+        if self.cookie_samesite == "none" and not self.cookie_secure:
+            raise ValueError("Cookie SameSite=None 时必须开启 Cookie Secure")
+
+        if self.environment == Environment.PRODUCTION:
+            if not self.cookie_secure:
+                raise ValueError("生产环境必须开启 Cookie Secure")
+            if "*" in self.allowed_origins:
+                raise ValueError("生产环境 CORS 不允许使用通配来源")
+            if "mallmate_dev_only" in self.database_url:
+                raise ValueError("生产环境不能使用默认数据库密码")
+            if self.minio_secret_key.get_secret_value() == "mallmate_dev_only":
+                raise ValueError("生产环境不能使用默认 MinIO 密码")
         return self
 
 

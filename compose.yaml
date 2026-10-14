@@ -1,6 +1,7 @@
 services:
   db:
-    image: pgvector/pgvector:0.8.7-pg17
+    # 标签便于阅读，摘要锁定昨晚实际下载并成功启动的镜像内容。
+    image: pgvector/pgvector:0.8.7-pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
     environment:
       POSTGRES_DB: mallmate
       POSTGRES_USER: mallmate
@@ -17,21 +18,25 @@ services:
       retries: 10
 
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
     ports:
       - "6379:6379"
     volumes:
       - ./data/redis:/data
 
   chroma:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma@sha256:1e0b73a187a28757c572acba508c46f48c9e8b0acaf5c20e6d95cdedce1acdf6
     ports:
       - "18000:8000"
     volumes:
       - ./data/chroma:/data
 
   minio:
-    image: minio/minio:latest
+    # 社区镜像仓库已停止公开分发；从官方 GitHub 固定开源标签构建本地镜像。
+    build:
+      context: .
+      dockerfile: infrastructure/minio/Dockerfile
+    image: mallmate-minio:release-2025-04-22
     command: server /data --console-address :9001
     environment:
       MINIO_ROOT_USER: mallmate
@@ -47,6 +52,8 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
+      MALLMATE_AUTH_ENABLED: "true"
+      MALLMATE_DEMO_MODE: "false"
       MALLMATE_DATABASE_URL: postgresql+psycopg://mallmate:mallmate_dev_only@db:5432/mallmate
       MALLMATE_CORS_ORIGINS: http://localhost:3000
       MALLMATE_REDIS_URL: redis://redis:6379/0
@@ -67,8 +74,14 @@ services:
       MALLMATE_LLM_RERANK_MODEL: qwen3-rerank
       MALLMATE_LLM_API_KEY: ${MALLMATE_LLM_API_KEY:-}
       MALLMATE_PROMETHEUS_ENABLED: "true"
+    env_file:
+      - ./backend/.env
     ports:
       - "18080:8000"
+    # PostgreSQL 首次创建数据目录时会短暂启动再重启。
+    # 如果迁移刚好撞上这个窗口，有限重试可在数据库稳定后自动恢复，
+    # 同时避免配置或代码错误造成无限重启。
+    restart: "on-failure:5"
     depends_on:
       db:
         condition: service_healthy
@@ -85,13 +98,15 @@ services:
       dockerfile: frontend/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: http://localhost:18080
+        # compose.yaml 只用于本地开发，因此显式开放演示账号提示。
+        NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS: "true"
     ports:
       - "3000:3000"
     depends_on:
       - backend
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "MallMate 演示客服",
-  description: "电商客服与售后 Agent 开发骨架",
+  title: "MallMate 电商售后助手",
+  description: "支持身份认证、客服咨询与售后申请的电商 Agent",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

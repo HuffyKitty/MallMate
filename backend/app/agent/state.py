@@ -8,13 +8,13 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from app.core.enums import Intent, Urgency
+from app.core.security import Principal
 from app.services.knowledge import KnowledgeService
 from app.services.orders import OrderService
 
 
 class AgentState(TypedDict, total=False):
     message: str
-    customer_id: int
     intent: Intent
     urgency: Urgency
     confidence: float
@@ -25,8 +25,9 @@ class AgentState(TypedDict, total=False):
 
 @dataclass(frozen=True)
 class AgentContext:
-    """只在本次 invoke 中使用的服务，不会被保存成会话状态。"""
+    """只在本次 invoke 中使用的可信身份和服务，不会被保存成会话状态。"""
 
+    principal: Principal
     orders: OrderService
     knowledge: KnowledgeService
 

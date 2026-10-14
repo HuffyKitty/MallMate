@@ -16,6 +16,9 @@ dependencies = [
   "langgraph>=0.6,<2",
   "openai>=1.60,<3",
   "prometheus-client>=0.21,<1",
+  "alembic>=1.14,<2",
+  "pwdlib[argon2]>=0.2,<1",
+  "PyJWT>=2.10,<3",
 ]
 
 [tool.setuptools.packages.find]

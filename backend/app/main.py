@@ -13,19 +13,14 @@ from app.api.errors import register_exception_handlers
 from app.api.router import api_router
 from app.bootstrap.seed import seed_demo
 from app.core.config import settings
-from app.db.base import Base
-from app.db.session import SessionLocal, engine
+from app.db.session import SessionLocal
 from app.observability.metrics import PrometheusMiddleware, metrics_response
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    """开发模式的启动准备。
+    """应用启动后按配置补充幂等演示数据；表结构统一由 Alembic 管理。"""
 
-    create_all 只作为当前过渡方案；引入 Alembic 后，生产启动不再自动改表结构。
-    """
-
-    Base.metadata.create_all(bind=engine)
     if settings.seed_demo_data:
         with SessionLocal() as db:
             seed_demo(db)
@@ -37,15 +32,15 @@ def create_app() -> FastAPI:
 
     application = FastAPI(
         title="MallMate API",
-        version="0.2.0",
+        version="0.3.0",
         lifespan=lifespan,
     )
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.allowed_origins,
-        allow_credentials=False,
+        allow_origins=settings.allowed_origins,  # 必须是明确来源，不能与凭据模式混用通配符
+        allow_credentials=True,  # 刷新令牌保存在 HttpOnly Cookie，需要浏览器携带凭据
         allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type", "X-Demo-User", "Idempotency-Key"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key"],
     )
     if settings.prometheus_enabled:
         application.add_middleware(PrometheusMiddleware)

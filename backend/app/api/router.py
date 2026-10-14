@@ -2,11 +2,12 @@
 
 from fastapi import APIRouter
 
-from app.api.routes import after_sales, chat, health, orders
+from app.api.routes import after_sales, auth, chat, health, orders
 
 
 api_router = APIRouter()
 api_router.include_router(health.router)
+api_router.include_router(auth.router, prefix="/api/v1")
 api_router.include_router(chat.router, prefix="/api/v1")
 api_router.include_router(orders.router, prefix="/api/v1")
 api_router.include_router(after_sales.router, prefix="/api/v1")
