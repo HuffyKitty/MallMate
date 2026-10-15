@@ -15,6 +15,7 @@ dependencies = [
   "psycopg[binary]>=3.2,<4",
   "langgraph>=0.6,<2",
   "openai>=1.60,<3",
+  "chromadb>=1.0,<2",
   "prometheus-client>=0.21,<1",
   "alembic>=1.14,<2",
   "pwdlib[argon2]>=0.2,<1",

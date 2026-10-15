@@ -29,20 +29,26 @@ def classify(state: AgentState) -> AgentState:
 def answer_faq(state: AgentState, runtime: Runtime[AgentContext]) -> AgentState:
     """检索可信知识；没有证据时明确降级，不生成猜测答案。"""
 
-    evidence = runtime.context.knowledge.search(state["message"])
-    if evidence is None:
+    evidences = runtime.context.knowledge.search(state["message"])
+    if not evidences:
         return {
             "answer": "目前没有找到足够可靠的资料。请补充商品或问题细节，或联系人工客服。",
             "sources": [],
         }
+    # 返回检索父片段作为可信上下文；后续可在此节点加入基于这些证据的大模型生成。
+    context = "\n\n---\n\n".join(
+        f"【{evidence.title}｜版本 {evidence.version}】\n{evidence.content}"
+        for evidence in evidences
+    )
     return {
-        "answer": evidence.content,
+        "answer": context,
         "sources": [
             {
                 "title": evidence.title,
                 "version": evidence.version,
                 "uri": evidence.uri,
             }
+            for evidence in evidences
         ],
     }
 

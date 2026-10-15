@@ -7,6 +7,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
+    JSON,
     String,
     Text,
     UniqueConstraint,
@@ -184,7 +185,7 @@ class Shipment(Base):
 
 
 class KnowledgeDocument(Base):
-    """演示知识文档。真正 RAG 会在后续增加文档切片表。"""
+    """知识文档原文；文档级元数据和原文由 PostgreSQL 作为权威存储。"""
     __tablename__ = "knowledge_documents"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -195,6 +196,33 @@ class KnowledgeDocument(Base):
     source_uri: Mapped[str] = mapped_column(String(500))
     content: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(40), default="active")
+
+
+class KnowledgeChunk(Base):
+    """离线生成的父子片段；向量本身保存在 ChromaDB。"""
+
+    __tablename__ = "knowledge_chunks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    chunk_id: Mapped[str] = mapped_column(String(300), unique=True, index=True)
+    document_id: Mapped[str] = mapped_column(
+        ForeignKey("knowledge_documents.document_id", ondelete="CASCADE"), index=True
+    )
+    parent_chunk_id: Mapped[str | None] = mapped_column(
+        ForeignKey("knowledge_chunks.chunk_id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    level: Mapped[str] = mapped_column(String(20), index=True)
+    ordinal: Mapped[int] = mapped_column(Integer)
+    title_path: Mapped[list[str]] = mapped_column(JSON, default=list)
+    source_uri: Mapped[str] = mapped_column(String(500))
+    source_anchor: Mapped[str] = mapped_column(String(500), default="")
+    content_hash: Mapped[str] = mapped_column(String(64), index=True)
+    chunker_version: Mapped[str] = mapped_column(String(80))
+    content: Mapped[str] = mapped_column(Text)
+    # embedding_text 含标题路径，向量模型能看到小节上下文；父片段不生成向量。
+    embedding_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    embedding_model: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    vector_indexed: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
 
 
 class AfterSalesCase(Base):

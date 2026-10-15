@@ -64,15 +64,7 @@ services:
       MALLMATE_MINIO_ACCESS_KEY: mallmate
       MALLMATE_MINIO_SECRET_KEY: mallmate_dev_only
       MALLMATE_MINIO_BUCKET: mallmate-evidence
-      MALLMATE_LLM_ENABLED: ${MALLMATE_LLM_ENABLED:-false}
-      MALLMATE_LLM_PROVIDER: dashscope
-      MALLMATE_LLM_BASE_URL: ${MALLMATE_LLM_BASE_URL:-}
-      MALLMATE_LLM_CHAT_MODEL: qwen-plus
-      MALLMATE_LLM_INTENT_MODEL: qwen-flash
-      MALLMATE_LLM_VISION_MODEL: qwen-vl-plus
-      MALLMATE_LLM_EMBEDDING_MODEL: text-embedding-v4
-      MALLMATE_LLM_RERANK_MODEL: qwen3-rerank
-      MALLMATE_LLM_API_KEY: ${MALLMATE_LLM_API_KEY:-}
+      # LLM 参数和 API Key 统一从 backend/.env 读取；不要在这里写默认值覆盖它们。
       MALLMATE_PROMETHEUS_ENABLED: "true"
     env_file:
       - ./backend/.env
