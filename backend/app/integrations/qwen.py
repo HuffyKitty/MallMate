@@ -82,3 +82,16 @@ class QwenGateway:
         if not vectors:
             raise RuntimeError("查询文本没有生成 Embedding 向量")
         return vectors[0]
+
+    def chat(self, messages: list[dict[str, str]]) -> str:
+        """使用配置的聊天模型生成文本；与 Embedding 调用分开管理。"""
+
+        response = self.client().chat.completions.create(
+            model=self.models.chat,
+            messages=messages,
+            temperature=0.2,
+        )
+        content = response.choices[0].message.content
+        if not isinstance(content, str) or not content.strip():
+            raise RuntimeError("聊天模型没有返回可用文本")
+        return content.strip()

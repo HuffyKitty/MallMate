@@ -13,8 +13,17 @@ from app.services.knowledge import KnowledgeService
 from app.services.orders import OrderService
 
 
+class HistoryMessage(TypedDict):
+    """数据库中一条历史消息的轻量表示；不把 ORM 对象放进图状态。"""
+
+    role: str
+    content: str
+
+
 class AgentState(TypedDict, total=False):
     message: str
+    # 本次请求前已经发生的对话；新一轮 user 消息单独放在 message 字段。
+    history: list[HistoryMessage]
     intent: Intent
     urgency: Urgency
     confidence: float

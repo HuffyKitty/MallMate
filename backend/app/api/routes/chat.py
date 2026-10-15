@@ -33,9 +33,17 @@ def chat(
 ) -> dict:
     conversation = conversations.get_or_create(customer.id, request.conversation_id)
 
+    # 先读取本用户、本会话最近 10 条历史消息（最多 5 轮）。
+    # 当前请求还未保存，因此不会在 history 和 message 中重复出现。
+    history = conversations.get_recent_history(
+        customer_id=customer.id,
+        conversation_id=conversation.id,
+        rounds=5,
+    )
+
     # State 保存任务数据；Context 注入本次请求可用的业务服务。
     result = agent_graph.invoke(
-        {"message": request.message},
+        {"message": request.message, "history": history},
         context=AgentContext(principal=principal, orders=orders, knowledge=knowledge),
     )
     conversations.save_exchange(conversation.id, request.message, result["answer"])
